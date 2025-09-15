@@ -141,23 +141,7 @@ namespace echec_poo.Game
             // Vider l'échiquier
             _pieces = new Piece?[8, 8];
 
-            // Pièces blanches
-            PlacerPiece(new Pieces.Tour(Couleur.Blanc, new Position(0, 0)));
-            PlacerPiece(new Pieces.Cavalier(Couleur.Blanc, new Position(0, 1)));
-            PlacerPiece(new Pieces.Fou(Couleur.Blanc, new Position(0, 2)));
-            PlacerPiece(new Pieces.Dame(Couleur.Blanc, new Position(0, 3)));
-            PlacerPiece(new Pieces.Roi(Couleur.Blanc, new Position(0, 4)));
-            PlacerPiece(new Pieces.Fou(Couleur.Blanc, new Position(0, 5)));
-            PlacerPiece(new Pieces.Cavalier(Couleur.Blanc, new Position(0, 6)));
-            PlacerPiece(new Pieces.Tour(Couleur.Blanc, new Position(0, 7)));
-
-            // Pions blancs
-            for (int colonne = 0; colonne < 8; colonne++)
-            {
-                PlacerPiece(new Pieces.Pion(Couleur.Blanc, new Position(1, colonne)));
-            }
-
-            // Pièces noires
+            // Pièces noires (en haut - ligne 7 = rangée 8 affichée)
             PlacerPiece(new Pieces.Tour(Couleur.Noir, new Position(7, 0)));
             PlacerPiece(new Pieces.Cavalier(Couleur.Noir, new Position(7, 1)));
             PlacerPiece(new Pieces.Fou(Couleur.Noir, new Position(7, 2)));
@@ -167,11 +151,27 @@ namespace echec_poo.Game
             PlacerPiece(new Pieces.Cavalier(Couleur.Noir, new Position(7, 6)));
             PlacerPiece(new Pieces.Tour(Couleur.Noir, new Position(7, 7)));
 
-            // Pions noirs
+            // Pions noirs (ligne 6 = rangée 7 affichée)
             for (int colonne = 0; colonne < 8; colonne++)
             {
                 PlacerPiece(new Pieces.Pion(Couleur.Noir, new Position(6, colonne)));
             }
+
+            // Pions blancs (ligne 1 = rangée 2 affichée)
+            for (int colonne = 0; colonne < 8; colonne++)
+            {
+                PlacerPiece(new Pieces.Pion(Couleur.Blanc, new Position(1, colonne)));
+            }
+
+            // Pièces blanches (en bas - ligne 0 = rangée 1 affichée)
+            PlacerPiece(new Pieces.Tour(Couleur.Blanc, new Position(0, 0)));
+            PlacerPiece(new Pieces.Cavalier(Couleur.Blanc, new Position(0, 1)));
+            PlacerPiece(new Pieces.Fou(Couleur.Blanc, new Position(0, 2)));
+            PlacerPiece(new Pieces.Dame(Couleur.Blanc, new Position(0, 3)));
+            PlacerPiece(new Pieces.Roi(Couleur.Blanc, new Position(0, 4)));
+            PlacerPiece(new Pieces.Fou(Couleur.Blanc, new Position(0, 5)));
+            PlacerPiece(new Pieces.Cavalier(Couleur.Blanc, new Position(0, 6)));
+            PlacerPiece(new Pieces.Tour(Couleur.Blanc, new Position(0, 7)));
         }
 
         /// <summary>
@@ -187,30 +187,55 @@ namespace echec_poo.Game
         /// </summary>
         public string AfficherEchiquier()
         {
+            return AfficherEchiquier(null);
+        }
+
+        /// <summary>
+        /// Affiche l'échiquier avec indication des pièces du joueur actuel
+        /// </summary>
+        public string AfficherEchiquier(Couleur? couleurJoueurActuel)
+        {
             var sb = new System.Text.StringBuilder();
             
             // En-tête avec les lettres des colonnes
             sb.AppendLine("    a   b   c   d   e   f   g   h");
             sb.AppendLine("  +---+---+---+---+---+---+---+---+");
             
-            // Affichage des lignes (de 8 à 1)
+            // Affichage des lignes (de 1 à 8 - numéros inversés pour l'affichage)
             for (int ligne = 7; ligne >= 0; ligne--)
             {
-                sb.Append($"{ligne + 1} |");
+                int numeroAffiche = 8 - ligne; // 8→1, 7→2, 6→3, etc.
+                sb.Append($"{numeroAffiche} |");
                 
                 for (int colonne = 0; colonne < 8; colonne++)
                 {
                     Piece? piece = _pieces[ligne, colonne];
                     string symbole = piece?.ObtenirSymbole() ?? " ";
-                    sb.Append($" {symbole} |");
+                    
+                    // Mettre en évidence les pièces du joueur actuel
+                    if (piece != null && couleurJoueurActuel.HasValue && piece.Couleur == couleurJoueurActuel.Value)
+                    {
+                        sb.Append($"*{symbole}*|"); // Entourer les pièces du joueur actuel
+                    }
+                    else
+                    {
+                        sb.Append($" {symbole} |");
+                    }
                 }
                 
-                sb.AppendLine($" {ligne + 1}");
+                sb.AppendLine($" {numeroAffiche}");
                 sb.AppendLine("  +---+---+---+---+---+---+---+---+");
             }
             
             // Pied de page avec les lettres des colonnes
             sb.AppendLine("    a   b   c   d   e   f   g   h");
+            
+            // Légende
+            if (couleurJoueurActuel.HasValue)
+            {
+                sb.AppendLine();
+                sb.AppendLine($"Pièces du joueur actuel ({couleurJoueurActuel.Value}) : *P* (entourées d'astérisques)");
+            }
             
             return sb.ToString();
         }
@@ -220,11 +245,19 @@ namespace echec_poo.Game
         /// </summary>
         public string AfficherEchiquierAvecMouvements(Position positionPiece)
         {
+            return AfficherEchiquierAvecMouvements(positionPiece, null);
+        }
+
+        /// <summary>
+        /// Affiche l'échiquier avec les mouvements possibles d'une pièce et indication du joueur actuel
+        /// </summary>
+        public string AfficherEchiquierAvecMouvements(Position positionPiece, Couleur? couleurJoueurActuel)
+        {
             var sb = new System.Text.StringBuilder();
             Piece? piece = ObtenirPiece(positionPiece);
             
             if (piece == null)
-                return AfficherEchiquier();
+                return AfficherEchiquier(couleurJoueurActuel);
             
             List<Position> mouvements = piece.ObtenirMouvementsPossibles(this);
             
@@ -232,10 +265,11 @@ namespace echec_poo.Game
             sb.AppendLine("    a   b   c   d   e   f   g   h");
             sb.AppendLine("  +---+---+---+---+---+---+---+---+");
             
-            // Affichage des lignes (de 8 à 1)
+            // Affichage des lignes (de 1 à 8 - numéros inversés pour l'affichage)
             for (int ligne = 7; ligne >= 0; ligne--)
             {
-                sb.Append($"{ligne + 1} |");
+                int numeroAffiche = 8 - ligne; // 8→1, 7→2, 6→3, etc.
+                sb.Append($"{numeroAffiche} |");
                 
                 for (int colonne = 0; colonne < 8; colonne++)
                 {
@@ -245,7 +279,16 @@ namespace echec_poo.Game
                     if (pieceActuelle != null)
                     {
                         string symbole = pieceActuelle.ObtenirSymbole();
-                        sb.Append($" {symbole} |");
+                        
+                        // Mettre en évidence les pièces du joueur actuel
+                        if (couleurJoueurActuel.HasValue && pieceActuelle.Couleur == couleurJoueurActuel.Value)
+                        {
+                            sb.Append($"*{symbole}*|"); // Entourer les pièces du joueur actuel
+                        }
+                        else
+                        {
+                            sb.Append($" {symbole} |");
+                        }
                     }
                     else if (mouvements.Contains(pos))
                     {
@@ -257,12 +300,20 @@ namespace echec_poo.Game
                     }
                 }
                 
-                sb.AppendLine($" {ligne + 1}");
+                sb.AppendLine($" {numeroAffiche}");
                 sb.AppendLine("  +---+---+---+---+---+---+---+---+");
             }
             
             // Pied de page avec les lettres des colonnes
             sb.AppendLine("    a   b   c   d   e   f   g   h");
+            
+            // Légende
+            if (couleurJoueurActuel.HasValue)
+            {
+                sb.AppendLine();
+                sb.AppendLine($"Pièces du joueur actuel ({couleurJoueurActuel.Value}) : *P* (entourées d'astérisques)");
+                sb.AppendLine("• = Mouvements possibles de la pièce sélectionnée");
+            }
             
             return sb.ToString();
         }

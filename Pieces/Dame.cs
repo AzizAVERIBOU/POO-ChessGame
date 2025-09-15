@@ -87,7 +87,7 @@ namespace echec_poo.Pieces
 
         public override string ObtenirSymbole()
         {
-            return Couleur == Couleur.Blanc ? "♕" : "♛";
+            return Couleur == Couleur.Blanc ? "D" : "d";
         }
 
         public override string ObtenirNom()

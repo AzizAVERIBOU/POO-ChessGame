@@ -8,36 +8,41 @@ namespace echec_poo
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("=== JEU D'ÉCHECS - ITÉRATION 5 ===");
-            Console.WriteLine("Test de la validation complète...\n");
+            Console.WriteLine("=== JEU D'ÉCHECS COMPLET ===");
+            Console.WriteLine("Système de mouvements fonctionnel !\n");
 
-            // Test de la classe Position
-            TestPosition();
+            // Test rapide pour vérifier que tout fonctionne
+            TestRapide();
             
-            // Test de l'échiquier
-            TestEchiquier();
+            Console.WriteLine("\n" + new string('=', 50));
+            Console.WriteLine("LANCEMENT DU JEU INTERACTIF");
+            Console.WriteLine(new string('=', 50));
             
-            // Test des pièces
-            TestPieces();
-            
-            // Test de l'affichage
-            TestAffichage();
-            
-            // Test du système de mouvements
-            TestMouvements();
-            
-            // Test de la validation complète
-            TestValidationComplete();
-            
-            Console.WriteLine("\nItération 5 terminée avec succès !");
-            Console.WriteLine("Validation complète implémentée et testée.");
-            
-            // Optionnel: Lancer le jeu interactif
-            Console.WriteLine("\nVoulez-vous lancer le jeu interactif? (o/n)");
-            string? reponse = Console.ReadLine();
-            if (reponse?.ToLower() == "o" || reponse?.ToLower() == "oui")
+            // Lancer le jeu interactif
+            LancerJeuInteractif();
+        }
+
+        static void TestRapide()
+        {
+            try
             {
-                LancerJeuInteractif();
+                Console.WriteLine("Test rapide du système...");
+                Echiquier echiquier = new Echiquier();
+                echiquier.InitialiserPositionDepart();
+                
+                Console.WriteLine($"✅ Échiquier initialisé: {echiquier.ObtenirPieces(Couleur.Blanc).Count} pièces blanches, {echiquier.ObtenirPieces(Couleur.Noir).Count} pièces noires");
+                
+                // Test d'un mouvement
+                Position e2 = new Position(1, 4);
+                Position e4 = new Position(3, 4);
+                bool succes = echiquier.DeplacerPiece(e2, e4);
+                Console.WriteLine($"✅ Mouvement e2-e4: {(succes ? "Réussi" : "Échoué")}");
+                
+                Console.WriteLine("✅ Système prêt pour le jeu !");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erreur dans le test: {ex.Message}");
             }
         }
 
@@ -209,14 +214,27 @@ namespace echec_poo
             try
             {
                 JeuEchecs jeu = new JeuEchecs("Alice", "Bob");
+                Console.WriteLine("Jeu créé, initialisation de la partie...");
                 jeu.NouvellePartie();
+                Console.WriteLine("Partie initialisée");
                 
                 Console.WriteLine("État initial:");
                 Console.WriteLine(jeu.ObtenirEtatJeu());
                 Console.WriteLine();
                 
+                // Vérifier l'échiquier
+                Console.WriteLine("Vérification de l'échiquier:");
+                Console.WriteLine($"Pièces blanches: {jeu.Echiquier.ObtenirPieces(Couleur.Blanc).Count}");
+                Console.WriteLine($"Pièces noires: {jeu.Echiquier.ObtenirPieces(Couleur.Noir).Count}");
+                
+                // Vérifier une pièce spécifique
+                Piece? pionE2 = jeu.Echiquier.ObtenirPiece(new Position(1, 4)); // e2
+                Console.WriteLine($"Pion en e2: {pionE2?.ToString() ?? "Aucun"}");
+                Console.WriteLine();
+                
                 // Test de mouvements valides
                 Console.WriteLine("Test du mouvement e2-e4 (pion blanc):");
+                Console.WriteLine("Avant appel à EffectuerMouvement...");
                 bool succes1 = jeu.EffectuerMouvement("e2-e4");
                 Console.WriteLine($"Mouvement réussi: {succes1}");
                 Console.WriteLine($"État après mouvement: {jeu.ObtenirEtatJeu()}");

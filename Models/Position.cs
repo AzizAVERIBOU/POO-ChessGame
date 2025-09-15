@@ -50,7 +50,9 @@ namespace echec_poo.Models
 
         public override string ToString()
         {
-            return $"{(char)('a' + Colonne)}{8 - Ligne}";
+            // Afficher la position avec la numérotation inversée (1 en haut, 8 en bas)
+            int numeroAffiche = 8 - Ligne;
+            return $"{(char)('a' + Colonne)}{numeroAffiche}";
         }
 
         /// <summary>
@@ -67,7 +69,13 @@ namespace echec_poo.Models
             if (colonne < 'a' || colonne > 'h' || ligne < '1' || ligne > '8')
                 throw new ArgumentException("Notation invalide");
 
-            return new Position(8 - (ligne - '0'), colonne - 'a');
+            // Conversion avec numérotation inversée :
+            // a1 affiché = (7,0), a8 affiché = (0,0), h1 affiché = (7,7), h8 affiché = (0,7)
+            // Ligne 1 affichée = index 7, ligne 8 affichée = index 0
+            int ligneIndex = 8 - (ligne - '0');
+            int colonneIndex = colonne - 'a';
+            
+            return new Position(ligneIndex, colonneIndex);
         }
     }
 }

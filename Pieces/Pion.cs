@@ -14,41 +14,41 @@ namespace echec_poo.Pieces
         {
         }
 
-        public override bool PeutSeDeplacerVers(Position nouvellePosition, Echiquier echiquier)
+        public override bool PeutSeDeplacerVers(Position destination, Echiquier echiquier)
         {
-            if (echiquier == null || !nouvellePosition.EstValide())
+            // Vérifier que la destination est valide
+            if (!destination.EstValide())
                 return false;
 
-            int deltaLigne = nouvellePosition.Ligne - Position.Ligne;
-            int deltaColonne = nouvellePosition.Colonne - Position.Colonne;
-
-            // Vérifier si c'est un mouvement vers l'avant
-            bool mouvementVersAvant = Couleur == Couleur.Blanc ? deltaLigne > 0 : deltaLigne < 0;
-            if (!mouvementVersAvant)
+            // Vérifier que la destination est différente de la position actuelle
+            if (destination.Equals(Position))
                 return false;
 
-            // Mouvement simple d'une case
-            if (Math.Abs(deltaLigne) == 1 && deltaColonne == 0)
-            {
-                return echiquier.PositionEstLibre(nouvellePosition);
-            }
+            // Vérifier que la destination est libre ou contient une pièce adverse
+            Piece? pieceCible = echiquier.ObtenirPiece(destination);
+            if (pieceCible != null && pieceCible.Couleur == Couleur)
+                return false;
 
-            // Premier mouvement de 2 cases
-            if (Math.Abs(deltaLigne) == 2 && deltaColonne == 0 && !ADejaBouge)
-            {
-                // Vérifier que la case intermédiaire est libre
-                Position caseIntermediaire = new Position(
-                    Position.Ligne + (deltaLigne / 2),
-                    Position.Colonne
-                );
-                return echiquier.PositionEstLibre(caseIntermediaire) && 
-                       echiquier.PositionEstLibre(nouvellePosition);
-            }
+            int direction = Couleur == Couleur.Blanc ? 1 : -1;
+            int deltaLigne = destination.Ligne - Position.Ligne;
+            int deltaColonne = destination.Colonne - Position.Colonne;
 
+            // Mouvement vers l'avant
+            if (deltaColonne == 0)
+            {
+                // Une case vers l'avant
+                if (deltaLigne == direction && pieceCible == null)
+                    return true;
+                
+                // Deux cases vers l'avant (premier mouvement)
+                if (deltaLigne == 2 * direction && pieceCible == null && 
+                    ((Couleur == Couleur.Blanc && Position.Ligne == 1) || 
+                     (Couleur == Couleur.Noir && Position.Ligne == 6)))
+                    return true;
+            }
             // Prise en diagonale
-            if (Math.Abs(deltaLigne) == 1 && Math.Abs(deltaColonne) == 1)
+            else if (Math.Abs(deltaColonne) == 1 && deltaLigne == direction)
             {
-                Piece? pieceCible = echiquier.ObtenirPiece(nouvellePosition);
                 return pieceCible != null && pieceCible.Couleur != Couleur;
             }
 
@@ -100,7 +100,7 @@ namespace echec_poo.Pieces
 
         public override string ObtenirSymbole()
         {
-            return Couleur == Couleur.Blanc ? "♙" : "♟";
+            return Couleur == Couleur.Blanc ? "P" : "p";
         }
 
         public override string ObtenirNom()

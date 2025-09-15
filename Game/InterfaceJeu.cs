@@ -21,6 +21,8 @@ namespace echec_poo.Game
         {
             Console.Clear();
             Console.WriteLine("=== JEU D'ÉCHECS ===");
+            Console.WriteLine($"État: {_jeu.ObtenirEtatJeu()}");
+            Console.WriteLine();
             Console.WriteLine("1. Nouvelle partie");
             Console.WriteLine("2. Afficher l'échiquier");
             Console.WriteLine("3. Jouer un coup");
@@ -37,7 +39,19 @@ namespace echec_poo.Game
             Console.Clear();
             Console.WriteLine(_jeu.ObtenirEtatJeu());
             Console.WriteLine();
-            Console.WriteLine(_jeu.Echiquier.AfficherEchiquier());
+            
+            // Vérifier que l'échiquier est initialisé
+            int piecesBlanches = _jeu.Echiquier.ObtenirPieces(Couleur.Blanc).Count;
+            int piecesNoires = _jeu.Echiquier.ObtenirPieces(Couleur.Noir).Count;
+            
+            if (piecesBlanches == 0 && piecesNoires == 0)
+            {
+                Console.WriteLine("⚠️  L'échiquier est vide ! Création d'une nouvelle partie...");
+                _jeu.NouvellePartie();
+            }
+            
+            // Afficher l'échiquier avec indication des pièces du joueur actuel
+            Console.WriteLine(_jeu.AfficherEchiquierAvecJoueurActuel());
             Console.WriteLine();
         }
 
@@ -49,7 +63,7 @@ namespace echec_poo.Game
             Console.Clear();
             Console.WriteLine(_jeu.ObtenirEtatJeu());
             Console.WriteLine();
-            Console.WriteLine(_jeu.Echiquier.AfficherEchiquier());
+            Console.WriteLine(_jeu.AfficherEchiquierAvecJoueurActuel());
             Console.WriteLine();
             Console.WriteLine("Entrez votre mouvement (ex: e2-e4 ou e2e4):");
             Console.Write("> ");
