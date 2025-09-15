@@ -2,6 +2,10 @@
 
 Un jeu d'échecs complet développé en C# pour démontrer les concepts de la Programmation Orientée Objet.
 
+[![.NET](https://img.shields.io/badge/.NET-8.0-blue.svg)](https://dotnet.microsoft.com/download)
+[![C#](https://img.shields.io/badge/C%23-12.0-purple.svg)](https://docs.microsoft.com/en-us/dotnet/csharp/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 ## 🎯 Objectifs du Projet
 
 Ce projet vise à démontrer la maîtrise des concepts fondamentaux de la POO :
@@ -13,24 +17,15 @@ Ce projet vise à démontrer la maîtrise des concepts fondamentaux de la POO :
 
 ## 🚀 Fonctionnalités
 
-### ✅ Itération 1 - Fondations (TERMINÉE)
-- [x] Classe `Position` avec validation et notation algébrique
-- [x] Classe abstraite `Piece` avec méthodes virtuelles
-- [x] Classe `Echiquier` pour la gestion du plateau
-- [x] Enumération `Couleur` pour les pièces
-- [x] Tests unitaires intégrés
-
-### 🔄 Itération 2 - Pièces (EN COURS)
-- [ ] Implémentation de toutes les pièces d'échecs
-- [ ] Règles de déplacement spécifiques à chaque pièce
-- [ ] Validation des mouvements
-
-### 📋 Itérations Prévues
-- [ ] **Itération 3** : Système d'affichage du plateau
-- [ ] **Itération 4** : Interface de saisie des mouvements
-- [ ] **Itération 5** : Validation complète (échec, échec et mat)
-- [ ] **Itération 6** : Boucle principale du jeu
-- [ ] **Itération 7** : Règles avancées (roque, en passant, promotion)
+### ✅ Fonctionnalités Implémentées
+- [x] **Toutes les pièces d'échecs** : Pion, Tour, Cavalier, Fou, Dame, Roi
+- [x] **Règles de déplacement** : Mouvements spécifiques à chaque pièce
+- [x] **Interface utilisateur** : Menu interactif en console
+- [x] **Affichage amélioré** : Indication visuelle des pièces du joueur actuel
+- [x] **Validation des mouvements** : Vérification des règles d'échecs
+- [x] **Notation algébrique** : Support des mouvements en format "e2-e4"
+- [x] **Système de tours** : Gestion des joueurs blancs et noirs
+- [x] **Détection d'échec** : Vérification basique de l'échec
 
 ## 🏗️ Architecture
 
