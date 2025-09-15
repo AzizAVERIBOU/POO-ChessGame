@@ -59,6 +59,10 @@ namespace echec_poo.Game
                 if (!piece.PeutSeDeplacerVers(arrivee, Echiquier))
                     return false;
 
+                // Vérifier que le mouvement ne met pas le roi en échec
+                if (MouvementMetRoiEnEchec(depart, arrivee))
+                    return false;
+
                 // Effectuer le mouvement
                 bool mouvementReussi = Echiquier.DeplacerPiece(depart, arrivee);
                 
@@ -69,6 +73,9 @@ namespace echec_poo.Game
                     
                     // Vérifier l'échec
                     VerifierEchec();
+                    
+                    // Vérifier l'échec et mat
+                    VerifierEchecEtMat();
                 }
 
                 return mouvementReussi;
@@ -124,6 +131,93 @@ namespace echec_poo.Game
         {
             JoueurBlanc.EstEnEchec = Echiquier.RoiEstEnEchec(Couleur.Blanc);
             JoueurNoir.EstEnEchec = Echiquier.RoiEstEnEchec(Couleur.Noir);
+        }
+
+        /// <summary>
+        /// Vérifie si un mouvement met le roi en échec
+        /// </summary>
+        private bool MouvementMetRoiEnEchec(Position depart, Position arrivee)
+        {
+            // Simuler le mouvement
+            Piece? piece = Echiquier.ObtenirPiece(depart);
+            if (piece == null) return false;
+
+            Piece? pieceCapturee = Echiquier.ObtenirPiece(arrivee);
+            
+            // Effectuer le mouvement temporairement
+            Echiquier.RetirerPiece(depart);
+            if (pieceCapturee != null)
+                Echiquier.RetirerPiece(arrivee);
+            
+            // Créer une copie temporaire de la pièce
+            Piece pieceTemp = piece;
+            pieceTemp.DeplacerVers(arrivee);
+            Echiquier.PlacerPiece(pieceTemp);
+
+            // Vérifier si le roi est en échec
+            bool roiEnEchec = Echiquier.RoiEstEnEchec(piece.Couleur);
+
+            // Annuler le mouvement
+            Echiquier.RetirerPiece(arrivee);
+            pieceTemp.DeplacerVers(depart);
+            Echiquier.PlacerPiece(pieceTemp);
+            if (pieceCapturee != null)
+                Echiquier.PlacerPiece(pieceCapturee);
+
+            return roiEnEchec;
+        }
+
+        /// <summary>
+        /// Vérifie l'échec et mat
+        /// </summary>
+        private void VerifierEchecEtMat()
+        {
+            Couleur couleurAdverse = JoueurActuel.Couleur == Couleur.Blanc ? Couleur.Noir : Couleur.Blanc;
+            
+            if (Echiquier.RoiEstEnEchec(couleurAdverse))
+            {
+                // Vérifier si le joueur adverse peut sortir de l'échec
+                if (!PeutSortirDeEchec(couleurAdverse))
+                {
+                    PartieTerminee = true;
+                    Gagnant = JoueurActuel.Nom;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Vérifie si un joueur peut sortir de l'échec
+        /// </summary>
+        private bool PeutSortirDeEchec(Couleur couleur)
+        {
+            List<Piece> pieces = Echiquier.ObtenirPieces(couleur);
+            
+            foreach (Piece piece in pieces)
+            {
+                List<Position> mouvements = piece.ObtenirMouvementsPossibles(Echiquier);
+                
+                foreach (Position mouvement in mouvements)
+                {
+                    // Vérifier si ce mouvement sort de l'échec
+                    if (!MouvementMetRoiEnEchec(piece.Position, mouvement))
+                    {
+                        return true;
+                    }
+                }
+            }
+            
+            return false;
+        }
+
+        /// <summary>
+        /// Vérifie le pat (nul)
+        /// </summary>
+        public bool EstPat()
+        {
+            if (Echiquier.RoiEstEnEchec(JoueurActuel.Couleur))
+                return false; // Pas de pat si en échec
+
+            return !PeutSortirDeEchec(JoueurActuel.Couleur);
         }
 
         /// <summary>

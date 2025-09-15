@@ -81,9 +81,12 @@ namespace echec_poo.Pieces
             // Prises en diagonale
             for (int deltaColonne = -1; deltaColonne <= 1; deltaColonne += 2)
             {
-                Position prise = new Position(Position.Ligne + direction, Position.Colonne + deltaColonne);
-                if (prise.EstValide())
+                int nouvelleLigne = Position.Ligne + direction;
+                int nouvelleColonne = Position.Colonne + deltaColonne;
+                
+                if (nouvelleLigne >= 0 && nouvelleLigne <= 7 && nouvelleColonne >= 0 && nouvelleColonne <= 7)
                 {
+                    Position prise = new Position(nouvelleLigne, nouvelleColonne);
                     Piece? pieceCible = echiquier.ObtenirPiece(prise);
                     if (pieceCible != null && pieceCible.Couleur != Couleur)
                     {

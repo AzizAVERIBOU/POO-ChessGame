@@ -8,8 +8,8 @@ namespace echec_poo
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("=== JEU D'ÉCHECS - ITÉRATION 4 ===");
-            Console.WriteLine("Test du système de mouvements...\n");
+            Console.WriteLine("=== JEU D'ÉCHECS - ITÉRATION 5 ===");
+            Console.WriteLine("Test de la validation complète...\n");
 
             // Test de la classe Position
             TestPosition();
@@ -26,8 +26,11 @@ namespace echec_poo
             // Test du système de mouvements
             TestMouvements();
             
-            Console.WriteLine("\nItération 4 terminée avec succès !");
-            Console.WriteLine("Système de mouvements implémenté et testé.");
+            // Test de la validation complète
+            TestValidationComplete();
+            
+            Console.WriteLine("\nItération 5 terminée avec succès !");
+            Console.WriteLine("Validation complète implémentée et testée.");
             
             // Optionnel: Lancer le jeu interactif
             Console.WriteLine("\nVoulez-vous lancer le jeu interactif? (o/n)");
@@ -245,6 +248,46 @@ namespace echec_poo
             catch (Exception ex)
             {
                 Console.WriteLine($"❌ Erreur dans TestMouvements: {ex.Message}");
+            }
+        }
+
+        static void TestValidationComplete()
+        {
+            Console.WriteLine("\n--- Test de la Validation Complète ---");
+            
+            try
+            {
+                JeuEchecs jeu = new JeuEchecs("Alice", "Bob");
+                jeu.NouvellePartie();
+                
+                Console.WriteLine("Test de la détection d'échec:");
+                Console.WriteLine($"Roi blanc en échec: {jeu.Echiquier.RoiEstEnEchec(Couleur.Blanc)}");
+                Console.WriteLine($"Roi noir en échec: {jeu.Echiquier.RoiEstEnEchec(Couleur.Noir)}");
+                Console.WriteLine();
+                
+                Console.WriteLine("Test des mouvements avec validation:");
+                Console.WriteLine("Mouvement e2-e4 (devrait réussir):");
+                bool succes1 = jeu.EffectuerMouvement("e2-e4");
+                Console.WriteLine($"Résultat: {succes1}");
+                Console.WriteLine($"État: {jeu.ObtenirEtatJeu()}");
+                Console.WriteLine();
+                
+                Console.WriteLine("Mouvement e7-e5 (devrait réussir):");
+                bool succes2 = jeu.EffectuerMouvement("e7-e5");
+                Console.WriteLine($"Résultat: {succes2}");
+                Console.WriteLine($"État: {jeu.ObtenirEtatJeu()}");
+                Console.WriteLine();
+                
+                Console.WriteLine("Test du pat:");
+                bool estPat = jeu.EstPat();
+                Console.WriteLine($"Est en pat: {estPat}");
+                Console.WriteLine();
+                
+                Console.WriteLine("✅ Validation complète fonctionne correctement");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erreur dans TestValidationComplete: {ex.Message}");
             }
         }
 

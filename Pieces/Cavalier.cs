@@ -44,13 +44,12 @@ namespace echec_poo.Pieces
 
             for (int i = 0; i < 8; i++)
             {
-                Position nouvellePosition = new Position(
-                    Position.Ligne + mouvementsL[i, 0],
-                    Position.Colonne + mouvementsL[i, 1]
-                );
-
-                if (nouvellePosition.EstValide())
+                int nouvelleLigne = Position.Ligne + mouvementsL[i, 0];
+                int nouvelleColonne = Position.Colonne + mouvementsL[i, 1];
+                
+                if (nouvelleLigne >= 0 && nouvelleLigne <= 7 && nouvelleColonne >= 0 && nouvelleColonne <= 7)
                 {
+                    Position nouvellePosition = new Position(nouvelleLigne, nouvelleColonne);
                     Piece? pieceCible = echiquier.ObtenirPiece(nouvellePosition);
                     if (pieceCible == null || pieceCible.Couleur != Couleur)
                     {
