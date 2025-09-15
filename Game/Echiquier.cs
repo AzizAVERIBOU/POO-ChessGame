@@ -179,8 +179,92 @@ namespace echec_poo.Game
         /// </summary>
         public override string ToString()
         {
-            // Cette méthode sera implémentée dans l'itération 3 (Affichage)
-            return "Échiquier - Affichage à implémenter";
+            return AfficherEchiquier();
+        }
+
+        /// <summary>
+        /// Affiche l'échiquier avec les pièces et les coordonnées
+        /// </summary>
+        public string AfficherEchiquier()
+        {
+            var sb = new System.Text.StringBuilder();
+            
+            // En-tête avec les lettres des colonnes
+            sb.AppendLine("    a   b   c   d   e   f   g   h");
+            sb.AppendLine("  +---+---+---+---+---+---+---+---+");
+            
+            // Affichage des lignes (de 8 à 1)
+            for (int ligne = 7; ligne >= 0; ligne--)
+            {
+                sb.Append($"{ligne + 1} |");
+                
+                for (int colonne = 0; colonne < 8; colonne++)
+                {
+                    Piece? piece = _pieces[ligne, colonne];
+                    string symbole = piece?.ObtenirSymbole() ?? " ";
+                    sb.Append($" {symbole} |");
+                }
+                
+                sb.AppendLine($" {ligne + 1}");
+                sb.AppendLine("  +---+---+---+---+---+---+---+---+");
+            }
+            
+            // Pied de page avec les lettres des colonnes
+            sb.AppendLine("    a   b   c   d   e   f   g   h");
+            
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Affiche l'échiquier avec les mouvements possibles d'une pièce
+        /// </summary>
+        public string AfficherEchiquierAvecMouvements(Position positionPiece)
+        {
+            var sb = new System.Text.StringBuilder();
+            Piece? piece = ObtenirPiece(positionPiece);
+            
+            if (piece == null)
+                return AfficherEchiquier();
+            
+            List<Position> mouvements = piece.ObtenirMouvementsPossibles(this);
+            
+            // En-tête avec les lettres des colonnes
+            sb.AppendLine("    a   b   c   d   e   f   g   h");
+            sb.AppendLine("  +---+---+---+---+---+---+---+---+");
+            
+            // Affichage des lignes (de 8 à 1)
+            for (int ligne = 7; ligne >= 0; ligne--)
+            {
+                sb.Append($"{ligne + 1} |");
+                
+                for (int colonne = 0; colonne < 8; colonne++)
+                {
+                    Position pos = new Position(ligne, colonne);
+                    Piece? pieceActuelle = _pieces[ligne, colonne];
+                    
+                    if (pieceActuelle != null)
+                    {
+                        string symbole = pieceActuelle.ObtenirSymbole();
+                        sb.Append($" {symbole} |");
+                    }
+                    else if (mouvements.Contains(pos))
+                    {
+                        sb.Append(" • |"); // Point pour les mouvements possibles
+                    }
+                    else
+                    {
+                        sb.Append("   |");
+                    }
+                }
+                
+                sb.AppendLine($" {ligne + 1}");
+                sb.AppendLine("  +---+---+---+---+---+---+---+---+");
+            }
+            
+            // Pied de page avec les lettres des colonnes
+            sb.AppendLine("    a   b   c   d   e   f   g   h");
+            
+            return sb.ToString();
         }
     }
 }

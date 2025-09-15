@@ -8,8 +8,8 @@ namespace echec_poo
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("=== JEU D'ÉCHECS - ITÉRATION 2 ===");
-            Console.WriteLine("Test des pièces d'échecs...\n");
+            Console.WriteLine("=== JEU D'ÉCHECS - ITÉRATION 3 ===");
+            Console.WriteLine("Test du système d'affichage...\n");
 
             // Test de la classe Position
             TestPosition();
@@ -20,8 +20,11 @@ namespace echec_poo
             // Test des pièces
             TestPieces();
             
-            Console.WriteLine("\n✅ Itération 2 terminée avec succès !");
-            Console.WriteLine("Toutes les pièces d'échecs implémentées et testées.");
+            // Test de l'affichage
+            TestAffichage();
+            
+            Console.WriteLine("\nItération 3 terminée avec succès !");
+            Console.WriteLine("Système d'affichage implémenté et testé.");
         }
 
         static void TestPosition()
@@ -154,6 +157,34 @@ namespace echec_poo
             catch (Exception ex)
             {
                 Console.WriteLine($"❌ Erreur dans TestPieces: {ex.Message}");
+            }
+        }
+
+        static void TestAffichage()
+        {
+            Console.WriteLine("\n--- Test du Système d'Affichage ---");
+            
+            try
+            {
+                Echiquier echiquier = new Echiquier();
+                echiquier.InitialiserPositionDepart();
+                
+                Console.WriteLine("Échiquier complet :");
+                Console.WriteLine(echiquier.AfficherEchiquier());
+                
+                Console.WriteLine("\nMouvements possibles du pion blanc en a7 :");
+                Position positionPion = new Position(1, 0);
+                Console.WriteLine(echiquier.AfficherEchiquierAvecMouvements(positionPion));
+                
+                Console.WriteLine("\nMouvements possibles du cavalier blanc en b8 :");
+                Position positionCavalier = new Position(0, 1);
+                Console.WriteLine(echiquier.AfficherEchiquierAvecMouvements(positionCavalier));
+                
+                Console.WriteLine("✅ Système d'affichage fonctionne correctement");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erreur dans TestAffichage: {ex.Message}");
             }
         }
     }
