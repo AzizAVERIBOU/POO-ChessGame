@@ -138,8 +138,40 @@ namespace echec_poo.Game
         /// </summary>
         public void InitialiserPositionDepart()
         {
-            // Cette méthode sera implémentée dans la prochaine itération
-            // avec la création des pièces spécifiques
+            // Vider l'échiquier
+            _pieces = new Piece?[8, 8];
+
+            // Pièces blanches
+            PlacerPiece(new Pieces.Tour(Couleur.Blanc, new Position(0, 0)));
+            PlacerPiece(new Pieces.Cavalier(Couleur.Blanc, new Position(0, 1)));
+            PlacerPiece(new Pieces.Fou(Couleur.Blanc, new Position(0, 2)));
+            PlacerPiece(new Pieces.Dame(Couleur.Blanc, new Position(0, 3)));
+            PlacerPiece(new Pieces.Roi(Couleur.Blanc, new Position(0, 4)));
+            PlacerPiece(new Pieces.Fou(Couleur.Blanc, new Position(0, 5)));
+            PlacerPiece(new Pieces.Cavalier(Couleur.Blanc, new Position(0, 6)));
+            PlacerPiece(new Pieces.Tour(Couleur.Blanc, new Position(0, 7)));
+
+            // Pions blancs
+            for (int colonne = 0; colonne < 8; colonne++)
+            {
+                PlacerPiece(new Pieces.Pion(Couleur.Blanc, new Position(1, colonne)));
+            }
+
+            // Pièces noires
+            PlacerPiece(new Pieces.Tour(Couleur.Noir, new Position(7, 0)));
+            PlacerPiece(new Pieces.Cavalier(Couleur.Noir, new Position(7, 1)));
+            PlacerPiece(new Pieces.Fou(Couleur.Noir, new Position(7, 2)));
+            PlacerPiece(new Pieces.Dame(Couleur.Noir, new Position(7, 3)));
+            PlacerPiece(new Pieces.Roi(Couleur.Noir, new Position(7, 4)));
+            PlacerPiece(new Pieces.Fou(Couleur.Noir, new Position(7, 5)));
+            PlacerPiece(new Pieces.Cavalier(Couleur.Noir, new Position(7, 6)));
+            PlacerPiece(new Pieces.Tour(Couleur.Noir, new Position(7, 7)));
+
+            // Pions noirs
+            for (int colonne = 0; colonne < 8; colonne++)
+            {
+                PlacerPiece(new Pieces.Pion(Couleur.Noir, new Position(6, colonne)));
+            }
         }
 
         /// <summary>
