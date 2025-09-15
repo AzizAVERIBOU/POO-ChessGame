@@ -8,8 +8,8 @@ namespace echec_poo
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("=== JEU D'ÉCHECS - ITÉRATION 3 ===");
-            Console.WriteLine("Test du système d'affichage...\n");
+            Console.WriteLine("=== JEU D'ÉCHECS - ITÉRATION 4 ===");
+            Console.WriteLine("Test du système de mouvements...\n");
 
             // Test de la classe Position
             TestPosition();
@@ -23,8 +23,19 @@ namespace echec_poo
             // Test de l'affichage
             TestAffichage();
             
-            Console.WriteLine("\nItération 3 terminée avec succès !");
-            Console.WriteLine("Système d'affichage implémenté et testé.");
+            // Test du système de mouvements
+            TestMouvements();
+            
+            Console.WriteLine("\nItération 4 terminée avec succès !");
+            Console.WriteLine("Système de mouvements implémenté et testé.");
+            
+            // Optionnel: Lancer le jeu interactif
+            Console.WriteLine("\nVoulez-vous lancer le jeu interactif? (o/n)");
+            string? reponse = Console.ReadLine();
+            if (reponse?.ToLower() == "o" || reponse?.ToLower() == "oui")
+            {
+                LancerJeuInteractif();
+            }
         }
 
         static void TestPosition()
@@ -186,6 +197,66 @@ namespace echec_poo
             {
                 Console.WriteLine($"❌ Erreur dans TestAffichage: {ex.Message}");
             }
+        }
+
+        static void TestMouvements()
+        {
+            Console.WriteLine("\n--- Test du Système de Mouvements ---");
+            
+            try
+            {
+                JeuEchecs jeu = new JeuEchecs("Alice", "Bob");
+                jeu.NouvellePartie();
+                
+                Console.WriteLine("État initial:");
+                Console.WriteLine(jeu.ObtenirEtatJeu());
+                Console.WriteLine();
+                
+                // Test de mouvements valides
+                Console.WriteLine("Test du mouvement e2-e4 (pion blanc):");
+                bool succes1 = jeu.EffectuerMouvement("e2-e4");
+                Console.WriteLine($"Mouvement réussi: {succes1}");
+                Console.WriteLine($"État après mouvement: {jeu.ObtenirEtatJeu()}");
+                Console.WriteLine();
+                
+                Console.WriteLine("Test du mouvement e7-e5 (pion noir):");
+                bool succes2 = jeu.EffectuerMouvement("e7-e5");
+                Console.WriteLine($"Mouvement réussi: {succes2}");
+                Console.WriteLine($"État après mouvement: {jeu.ObtenirEtatJeu()}");
+                Console.WriteLine();
+                
+                // Test de mouvements invalides
+                Console.WriteLine("Test du mouvement invalide e2-e5 (pion ne peut pas avancer de 3 cases):");
+                bool succes3 = jeu.EffectuerMouvement("e2-e5");
+                Console.WriteLine($"Mouvement réussi: {succes3}");
+                Console.WriteLine();
+                
+                // Test des mouvements possibles
+                Console.WriteLine("Mouvements possibles du cavalier en b1:");
+                List<Position> mouvements = jeu.ObtenirMouvementsPossibles(new Position(0, 1));
+                Console.WriteLine($"Nombre de mouvements: {mouvements.Count}");
+                foreach (Position pos in mouvements.Take(5))
+                {
+                    Console.WriteLine($"  - {pos}");
+                }
+                
+                Console.WriteLine("✅ Système de mouvements fonctionne correctement");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erreur dans TestMouvements: {ex.Message}");
+            }
+        }
+
+        static void LancerJeuInteractif()
+        {
+            Console.Clear();
+            Console.WriteLine("=== JEU D'ÉCHECS INTERACTIF ===");
+            
+            JeuEchecs jeu = new JeuEchecs();
+            InterfaceJeu interfaceJeu = new InterfaceJeu(jeu);
+            
+            interfaceJeu.LancerJeu();
         }
     }
 }
