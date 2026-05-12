@@ -1,4 +1,5 @@
 using echec_poo.Models;
+using echec_poo.Pieces;
 
 namespace echec_poo.Game
 {
@@ -9,6 +10,12 @@ namespace echec_poo.Game
     public class Echiquier
     {
         private Piece?[,] _pieces;
+
+        /// <summary>
+        /// Case où un pion adverse peut être pris en passant (case traversée par un double pas),
+        /// valable uniquement pour le prochain demi-coup.
+        /// </summary>
+        public Position? CasePriseEnPassant { get; set; }
 
         public Echiquier()
         {
@@ -58,14 +65,54 @@ namespace echec_poo.Game
             if (!piece.PeutSeDeplacerVers(arrivee, this))
                 return false;
 
-            // Retirer la pièce de sa position actuelle
+            bool priseEp = EstCoupPriseEnPassant(depart, arrivee);
+            Position? casePionPrisEp = null;
+            if (priseEp)
+            {
+                int dir = piece.Couleur == Couleur.Blanc ? 1 : -1;
+                casePionPrisEp = Position.CreerSiValide(arrivee.Ligne - dir, arrivee.Colonne);
+                if (casePionPrisEp == null)
+                    return false;
+            }
+
             RetirerPiece(depart);
-            
-            // Placer la pièce à la nouvelle position
+
+            if (priseEp)
+                RetirerPiece(casePionPrisEp!);
+            else
+            {
+                Piece? capturee = ObtenirPiece(arrivee);
+                if (capturee != null)
+                    RetirerPiece(arrivee);
+            }
+
             piece.DeplacerVers(arrivee);
             PlacerPiece(piece);
 
             return true;
+        }
+
+        /// <summary>
+        /// Indique si le déplacement est une prise en passant (case d'arrivée vide, cible <see cref="CasePriseEnPassant"/>).
+        /// </summary>
+        public bool EstCoupPriseEnPassant(Position depart, Position arrivee)
+        {
+            Piece? p = ObtenirPiece(depart);
+            if (p is not Pion || CasePriseEnPassant is null || !arrivee.Equals(CasePriseEnPassant))
+                return false;
+            if (ObtenirPiece(arrivee) != null)
+                return false;
+
+            int dir = p.Couleur == Couleur.Blanc ? 1 : -1;
+            if (arrivee.Ligne - depart.Ligne != dir || Math.Abs(arrivee.Colonne - depart.Colonne) != 1)
+                return false;
+
+            Position? casePionPris = Position.CreerSiValide(arrivee.Ligne - dir, arrivee.Colonne);
+            if (casePionPris == null)
+                return false;
+
+            Piece? adjacent = ObtenirPiece(casePionPris);
+            return adjacent is Pion ap && ap.Couleur != p.Couleur;
         }
 
         /// <summary>
@@ -138,6 +185,7 @@ namespace echec_poo.Game
         /// </summary>
         public void InitialiserPositionDepart()
         {
+            CasePriseEnPassant = null;
             // Vider l'échiquier
             _pieces = new Piece?[8, 8];
 
@@ -201,10 +249,10 @@ namespace echec_poo.Game
             sb.AppendLine("    a   b   c   d   e   f   g   h");
             sb.AppendLine("  +---+---+---+---+---+---+---+---+");
             
-            // Affichage des lignes (de 1 à 8 - numéros inversés pour l'affichage)
+            // Affichage du haut (rangée 8, Ligne 7) vers le bas (rangée 1, Ligne 0) — numéros FIDE
             for (int ligne = 7; ligne >= 0; ligne--)
             {
-                int numeroAffiche = 8 - ligne; // 8→1, 7→2, 6→3, etc.
+                int numeroAffiche = ligne + 1;
                 sb.Append($"{numeroAffiche} |");
                 
                 for (int colonne = 0; colonne < 8; colonne++)
@@ -249,9 +297,10 @@ namespace echec_poo.Game
         }
 
         /// <summary>
-        /// Affiche l'échiquier avec les mouvements possibles d'une pièce et indication du joueur actuel
+        /// Affiche l'échiquier avec les mouvements possibles d'une pièce et indication du joueur actuel.
+        /// Si <paramref name="mouvementsSurcharges"/> est fourni (ex. coups légaux filtrés), il remplace le calcul brut.
         /// </summary>
-        public string AfficherEchiquierAvecMouvements(Position positionPiece, Couleur? couleurJoueurActuel)
+        public string AfficherEchiquierAvecMouvements(Position positionPiece, Couleur? couleurJoueurActuel, IReadOnlyList<Position>? mouvementsSurcharges = null)
         {
             var sb = new System.Text.StringBuilder();
             Piece? piece = ObtenirPiece(positionPiece);
@@ -259,16 +308,18 @@ namespace echec_poo.Game
             if (piece == null)
                 return AfficherEchiquier(couleurJoueurActuel);
             
-            List<Position> mouvements = piece.ObtenirMouvementsPossibles(this);
+            List<Position> mouvements = mouvementsSurcharges != null
+                ? new List<Position>(mouvementsSurcharges)
+                : piece.ObtenirMouvementsPossibles(this);
             
             // En-tête avec les lettres des colonnes
             sb.AppendLine("    a   b   c   d   e   f   g   h");
             sb.AppendLine("  +---+---+---+---+---+---+---+---+");
             
-            // Affichage des lignes (de 1 à 8 - numéros inversés pour l'affichage)
+            // Affichage du haut (rangée 8, Ligne 7) vers le bas (rangée 1, Ligne 0) — numéros FIDE
             for (int ligne = 7; ligne >= 0; ligne--)
             {
-                int numeroAffiche = 8 - ligne; // 8→1, 7→2, 6→3, etc.
+                int numeroAffiche = ligne + 1;
                 sb.Append($"{numeroAffiche} |");
                 
                 for (int colonne = 0; colonne < 8; colonne++)

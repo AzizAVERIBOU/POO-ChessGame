@@ -130,7 +130,7 @@ namespace echec_poo
                 Console.WriteLine($"Roi noir: {roiNoir?.ToString() ?? "Non trouvé"}");
                 
                 // Test des mouvements d'un pion
-                Piece? pionBlanc = echiquier.ObtenirPiece(new Position(1, 0)); // Pion blanc en a7
+                Piece? pionBlanc = echiquier.ObtenirPiece(new Position(1, 0)); // Pion blanc en a2
                 if (pionBlanc != null)
                 {
                     Console.WriteLine($"\nTest du pion blanc en {pionBlanc.Position}:");
@@ -150,7 +150,7 @@ namespace echec_poo
                 }
                 
                 // Test des mouvements d'un cavalier
-                Piece? cavalierBlanc = echiquier.ObtenirPiece(new Position(0, 1)); // Cavalier blanc en b8
+                Piece? cavalierBlanc = echiquier.ObtenirPiece(new Position(0, 1)); // Cavalier blanc en b1
                 if (cavalierBlanc != null)
                 {
                     Console.WriteLine($"\nTest du cavalier blanc en {cavalierBlanc.Position}:");
@@ -191,11 +191,11 @@ namespace echec_poo
                 Console.WriteLine("Échiquier complet :");
                 Console.WriteLine(echiquier.AfficherEchiquier());
                 
-                Console.WriteLine("\nMouvements possibles du pion blanc en a7 :");
+                Console.WriteLine("\nMouvements possibles du pion blanc en a2 :");
                 Position positionPion = new Position(1, 0);
                 Console.WriteLine(echiquier.AfficherEchiquierAvecMouvements(positionPion));
                 
-                Console.WriteLine("\nMouvements possibles du cavalier blanc en b8 :");
+                Console.WriteLine("\nMouvements possibles du cavalier blanc en b1 :");
                 Position positionCavalier = new Position(0, 1);
                 Console.WriteLine(echiquier.AfficherEchiquierAvecMouvements(positionCavalier));
                 

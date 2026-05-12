@@ -32,7 +32,7 @@ Ce projet vise à démontrer la maîtrise des concepts fondamentaux de la POO :
 ```
 echec-poo/
 ├── Models/
-│   ├── Position.cs      # Gestion des coordonnées et notation algébrique
+│   ├── Position.cs      # Coordonnées et notation algébrique FIDE
 │   ├── Couleur.cs       # Enumération des couleurs
 │   └── Piece.cs         # Classe abstraite de base
 ├── Game/
@@ -47,7 +47,8 @@ echec-poo/
 │   ├── Fou.cs           # Implémentation du fou
 │   ├── Dame.cs          # Implémentation de la dame
 │   └── Roi.cs           # Implémentation du roi
-└── Program.cs           # Point d'entrée et tests
+├── echec-poo.Tests/     # Tests unitaires (xUnit)
+└── Program.cs           # Point d'entrée et tests console
 ```
 
 ## Utilisation
@@ -82,9 +83,10 @@ dotnet run
 - Les pièces du joueur actuel sont entourées d'astérisques (*P*)
 - Interface claire avec légende explicative
 
-### Notation Algébrique
-- Support complet de la notation standard (e2-e4, a7a5, etc.)
-- Validation automatique des mouvements
+### Notation algébrique (FIDE)
+
+- **Rangées** : 1 = côté blanc (fond), 8 = côté noir — aligné sur l’affichage console et sur `Position.DepuisNotation` / `ToString`.
+- **Coups** : `e2e4` ou `e2-e4` (départ puis arrivée, deux cases en notation standard).
 
 ### Architecture POO
 - **Héritage** : Chaque pièce hérite de la classe `Piece`

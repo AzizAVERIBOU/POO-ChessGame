@@ -10,10 +10,9 @@ public class JeuEchecsTests
     {
         // Arrange
         var jeu = new JeuEchecs("Alice", "Bob");
-        // Notation alignée sur Position.DepuisNotation / plateau initial (équivalent « e2-e4 » classique)
 
         // Act
-        bool ok = jeu.EffectuerMouvement("e7e5");
+        bool ok = jeu.EffectuerMouvement("e2e4");
 
         // Assert
         Assert.True(ok);
@@ -28,7 +27,7 @@ public class JeuEchecsTests
         var jeu = new JeuEchecs();
 
         // Act
-        bool ok = jeu.EffectuerMouvement("e2e4");
+        bool ok = jeu.EffectuerMouvement("e7e5");
 
         // Assert
         Assert.False(ok);

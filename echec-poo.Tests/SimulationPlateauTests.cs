@@ -11,7 +11,7 @@ public class SimulationPlateauTests
         // Arrange
         var ech = new Echiquier();
         ech.InitialiserPositionDepart();
-        // pion blanc (1,4) → (3,4), équivalent notation projet « e7-e5 »
+        // pion blanc e2 → e4 (notation FIDE)
         var coup = Coup.Normal(new Position(1, 4), new Position(3, 4));
 
         // Act

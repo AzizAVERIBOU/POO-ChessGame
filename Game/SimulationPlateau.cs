@@ -1,4 +1,5 @@
 using echec_poo.Models;
+using echec_poo.Pieces;
 
 namespace echec_poo.Game
 {
@@ -21,11 +22,43 @@ namespace echec_poo.Game
             return coup.Type switch
             {
                 TypeCoup.Normal => EvaluerNormal(echiquier, coup),
-                TypeCoup.RoquePetit or TypeCoup.RoqueGrand or TypeCoup.PriseEnPassant or TypeCoup.Promotion =>
+                TypeCoup.PriseEnPassant => EvaluerPriseEnPassant(echiquier, coup),
+                TypeCoup.RoquePetit or TypeCoup.RoqueGrand or TypeCoup.Promotion =>
                     throw new NotSupportedException(
                         $"Le type de coup {coup.Type} sera pris en charge dans une phase ultérieure."),
                 _ => throw new ArgumentOutOfRangeException(nameof(coup), coup.Type, "Valeur d'énumération inconnue.")
             };
+        }
+
+        private static bool EvaluerPriseEnPassant(Echiquier echiquier, Coup coup)
+        {
+            Piece? piece = echiquier.ObtenirPiece(coup.Depart);
+            if (piece == null || piece is not Pion)
+                return false;
+
+            Couleur camp = piece.Couleur;
+            bool aDejaBougeAvant = piece.ADejaBouge;
+            int dir = camp == Couleur.Blanc ? 1 : -1;
+            Position casePionPris = new Position(coup.Arrivee.Ligne - dir, coup.Arrivee.Colonne);
+            Piece? pionPris = echiquier.ObtenirPiece(casePionPris);
+            Position? pepAvant = echiquier.CasePriseEnPassant;
+
+            echiquier.RetirerPiece(coup.Depart);
+            echiquier.RetirerPiece(casePionPris);
+            piece.DeplacerVers(coup.Arrivee);
+            echiquier.PlacerPiece(piece);
+            echiquier.CasePriseEnPassant = null;
+
+            bool enEchec = echiquier.RoiEstEnEchec(camp);
+
+            echiquier.RetirerPiece(coup.Arrivee);
+            piece.RestaurerEtatApresSimulation(coup.Depart, aDejaBougeAvant);
+            echiquier.PlacerPiece(piece);
+            if (pionPris != null)
+                echiquier.PlacerPiece(pionPris);
+            echiquier.CasePriseEnPassant = pepAvant;
+
+            return enEchec;
         }
 
         private static bool EvaluerNormal(Echiquier echiquier, Coup coup)
