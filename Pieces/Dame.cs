@@ -56,12 +56,10 @@ namespace echec_poo.Pieces
 
                 for (int distance = 1; distance < 8; distance++)
                 {
-                    Position nouvellePosition = new Position(
+                    Position? nouvellePosition = Position.CreerSiValide(
                         Position.Ligne + distance * deltaLigne,
-                        Position.Colonne + distance * deltaColonne
-                    );
-
-                    if (!nouvellePosition.EstValide())
+                        Position.Colonne + distance * deltaColonne);
+                    if (nouvellePosition == null)
                         break;
 
                     Piece? pieceCible = echiquier.ObtenirPiece(nouvellePosition);
