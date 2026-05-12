@@ -47,52 +47,70 @@ namespace echec_poo.Game
         {
             try
             {
+#if DEBUG
                 Console.WriteLine($"🔍 Débogage: Tentative de mouvement '{mouvement}'");
-                
+#endif
+
                 // Parser le mouvement (format: "e2-e4" ou "e2e4")
                 var (depart, arrivee) = ParserMouvement(mouvement);
                 
                 if (depart == null || arrivee == null)
                 {
+#if DEBUG
                     Console.WriteLine("❌ Échec: Impossible de parser le mouvement");
+#endif
                     return false;
                 }
                 
+#if DEBUG
                 Console.WriteLine($"🔍 Débogage: Départ = {depart}, Arrivée = {arrivee}");
+#endif
 
                 // Vérifier que c'est au tour du bon joueur
                 Piece? piece = Echiquier.ObtenirPiece(depart);
                 if (piece == null)
                 {
+#if DEBUG
                     Console.WriteLine("❌ Échec: Aucune pièce en position de départ");
+#endif
                     return false;
                 }
                 
                 if (piece.Couleur != JoueurActuel.Couleur)
                 {
+#if DEBUG
                     Console.WriteLine($"❌ Échec: Ce n'est pas au tour de cette pièce (couleur: {piece.Couleur}, tour: {JoueurActuel.Couleur})");
+#endif
                     return false;
                 }
                 
+#if DEBUG
                 Console.WriteLine($"🔍 Débogage: Pièce trouvée: {piece.ObtenirNom()} {piece.Couleur}");
+#endif
 
                 // Vérifier que le mouvement est valide
                 bool mouvementValide = piece.PeutSeDeplacerVers(arrivee, Echiquier);
+#if DEBUG
                 Console.WriteLine($"🔍 Débogage: Mouvement valide selon les règles: {mouvementValide}");
+#endif
                 
                 if (!mouvementValide)
                     return false;
 
                 // Vérifier que le mouvement ne met pas le roi en échec
                 bool metRoiEnEchec = MouvementMetRoiEnEchec(depart, arrivee);
+#if DEBUG
                 Console.WriteLine($"🔍 Débogage: Met le roi en échec: {metRoiEnEchec}");
+#endif
                 
                 if (metRoiEnEchec)
                     return false;
 
                 // Effectuer le mouvement
                 bool mouvementReussi = Echiquier.DeplacerPiece(depart, arrivee);
+#if DEBUG
                 Console.WriteLine($"🔍 Débogage: Déplacement réussi: {mouvementReussi}");
+#endif
                 
                 if (mouvementReussi)
                 {
@@ -108,11 +126,18 @@ namespace echec_poo.Game
 
                 return mouvementReussi;
             }
+#if DEBUG
             catch (Exception ex)
             {
                 Console.WriteLine($"❌ Erreur: {ex.Message}");
                 return false;
             }
+#else
+            catch (Exception)
+            {
+                return false;
+            }
+#endif
         }
 
         /// <summary>
@@ -167,34 +192,12 @@ namespace echec_poo.Game
         /// </summary>
         private bool MouvementMetRoiEnEchec(Position depart, Position arrivee)
         {
-            // Version simplifiée : vérifier seulement si le roi est en échec après le mouvement
             Piece? piece = Echiquier.ObtenirPiece(depart);
-            if (piece == null) return false;
+            if (piece == null)
+                return false;
 
-            // Simuler le mouvement temporairement
-            Piece? pieceCapturee = Echiquier.ObtenirPiece(arrivee);
-            
-            // Effectuer le mouvement
-            Echiquier.RetirerPiece(depart);
-            if (pieceCapturee != null)
-                Echiquier.RetirerPiece(arrivee);
-            
-            // Créer une nouvelle pièce temporaire
-            Piece pieceTemp = piece;
-            pieceTemp.DeplacerVers(arrivee);
-            Echiquier.PlacerPiece(pieceTemp);
-
-            // Vérifier si le roi est en échec
-            bool roiEnEchec = Echiquier.RoiEstEnEchec(piece.Couleur);
-
-            // Annuler le mouvement
-            Echiquier.RetirerPiece(arrivee);
-            pieceTemp.DeplacerVers(depart);
-            Echiquier.PlacerPiece(pieceTemp);
-            if (pieceCapturee != null)
-                Echiquier.PlacerPiece(pieceCapturee);
-
-            return roiEnEchec;
+            Coup coup = Coup.Normal(depart, arrivee);
+            return SimulationPlateau.RoiSeraitEnEchecApresCoup(Echiquier, coup);
         }
 
         /// <summary>

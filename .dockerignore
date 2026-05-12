@@ -1,0 +1,32 @@
+# Fichiers de build
+**/bin/
+**/obj/
+**/out/
+
+# Fichiers de développement
+**/.vs/
+**/.vscode/
+**/*.user
+**/*.suo
+**/*.sln.docstates
+
+# Fichiers Git
+**/.git/
+**/.gitignore
+
+# Fichiers de documentation
+**/README.md
+**/LICENSE
+
+# Fichiers de test
+**/TestResults/
+**/*.trx
+
+# Fichiers temporaires
+**/*.tmp
+**/*.log
+
+# Fichiers Docker
+**/Dockerfile*
+**/.dockerignore
+

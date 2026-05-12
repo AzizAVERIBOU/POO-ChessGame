@@ -40,6 +40,15 @@ namespace echec_poo.Models
         }
 
         /// <summary>
+        /// Restaure la position et le drapeau « a déjà bougé » après annulation d'une simulation sur le plateau.
+        /// </summary>
+        internal void RestaurerEtatApresSimulation(Position position, bool aDejaBouge)
+        {
+            Position = position;
+            ADejaBouge = aDejaBouge;
+        }
+
+        /// <summary>
         /// Vérifie si la pièce peut capturer une autre pièce
         /// </summary>
         public virtual bool PeutCapturer(Piece pieceCible, Echiquier echiquier)
