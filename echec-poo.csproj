@@ -8,4 +8,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="echec-poo.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="echec-poo.Tests/**" />
+  </ItemGroup>
+
 </Project>
