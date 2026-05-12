@@ -19,11 +19,19 @@ namespace echec_poo.Pieces
             if (echiquier == null || !nouvellePosition.EstValide())
                 return false;
 
-            int deltaLigne = Math.Abs(nouvellePosition.Ligne - Position.Ligne);
-            int deltaColonne = Math.Abs(nouvellePosition.Colonne - Position.Colonne);
+            int deltaLigne = nouvellePosition.Ligne - Position.Ligne;
+            int deltaColonneAbs = Math.Abs(nouvellePosition.Colonne - Position.Colonne);
 
-            // Vérifier que c'est un mouvement d'une case
-            if (deltaLigne > 1 || deltaColonne > 1)
+            int ligneFond = Couleur == Couleur.Blanc ? 0 : 7;
+            if (deltaLigne == 0 && deltaColonneAbs == 2 && Position.Ligne == ligneFond && Position.Colonne == 4)
+            {
+                return nouvellePosition.Colonne > Position.Colonne
+                    ? echiquier.PeutRoquerPetit(Couleur)
+                    : echiquier.PeutRoquerGrand(Couleur);
+            }
+
+            int deltaLigneAbs = Math.Abs(deltaLigne);
+            if (deltaLigneAbs > 1 || deltaColonneAbs > 1)
                 return false;
 
             // Vérifier que la case d'arrivée est libre ou contient une pièce adverse
@@ -57,10 +65,23 @@ namespace echec_poo.Pieces
 
                 Piece? pieceCible = echiquier.ObtenirPiece(nouvellePosition);
                 if (pieceCible == null || pieceCible.Couleur != Couleur)
-                {
-                    // TODO: Vérifier que le roi ne se met pas en échec
-                    // Cette vérification sera implémentée dans l'itération 5
                     mouvements.Add(nouvellePosition);
+            }
+
+            int ligneFond = Couleur == Couleur.Blanc ? 0 : 7;
+            if (Position.Ligne == ligneFond && Position.Colonne == 4)
+            {
+                if (echiquier.PeutRoquerPetit(Couleur))
+                {
+                    Position? g = Position.CreerSiValide(Position.Ligne, 6);
+                    if (g != null)
+                        mouvements.Add(g);
+                }
+                if (echiquier.PeutRoquerGrand(Couleur))
+                {
+                    Position? c = Position.CreerSiValide(Position.Ligne, 2);
+                    if (c != null)
+                        mouvements.Add(c);
                 }
             }
 
