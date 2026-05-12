@@ -1,4 +1,5 @@
 using echec_poo.Models;
+using echec_poo.Pieces;
 
 namespace echec_poo.Game
 {
@@ -114,6 +115,7 @@ namespace echec_poo.Game
                 
                 if (mouvementReussi)
                 {
+                    MettreAJourCasePriseEnPassant(Echiquier.ObtenirPiece(arrivee)!, depart, arrivee);
                     // Changer de joueur
                     ChangerTour();
                     
@@ -138,6 +140,20 @@ namespace echec_poo.Game
                 return false;
             }
 #endif
+        }
+
+        /// <summary>
+        /// Met à jour la case en passant après un demi-coup réussi (double pas de pion ou annulation).
+        /// </summary>
+        private void MettreAJourCasePriseEnPassant(Piece piece, Position depart, Position arrivee)
+        {
+            if (piece is Pion && Math.Abs(arrivee.Ligne - depart.Ligne) == 2)
+            {
+                int mid = (depart.Ligne + arrivee.Ligne) / 2;
+                Echiquier.CasePriseEnPassant = new Position(mid, depart.Colonne);
+            }
+            else
+                Echiquier.CasePriseEnPassant = null;
         }
 
         /// <summary>
@@ -196,51 +212,62 @@ namespace echec_poo.Game
             if (piece == null)
                 return false;
 
-            Coup coup = Coup.Normal(depart, arrivee);
+            TypeCoup type = Echiquier.EstCoupPriseEnPassant(depart, arrivee)
+                ? TypeCoup.PriseEnPassant
+                : TypeCoup.Normal;
+            Coup coup = new Coup(depart, arrivee, type);
             return SimulationPlateau.RoiSeraitEnEchecApresCoup(Echiquier, coup);
         }
 
         /// <summary>
-        /// Vérifie l'échec et mat
+        /// Vérifie l'échec et mat : le camp qui doit jouer est maté s'il est en échec et sans coup légal.
         /// </summary>
         private void VerifierEchecEtMat()
         {
-            Couleur couleurAdverse = JoueurActuel.Couleur == Couleur.Blanc ? Couleur.Noir : Couleur.Blanc;
-            
-            if (Echiquier.RoiEstEnEchec(couleurAdverse))
+            Couleur camp = JoueurActuel.Couleur;
+
+            if (!Echiquier.RoiEstEnEchec(camp))
+                return;
+
+            if (!CampPossedeAuMoinsUnCoupLegal(camp))
             {
-                // Vérifier si le joueur adverse peut sortir de l'échec
-                if (!PeutSortirDeEchec(couleurAdverse))
-                {
-                    PartieTerminee = true;
-                    Gagnant = JoueurActuel.Nom;
-                }
+                PartieTerminee = true;
+                Gagnant = camp == Couleur.Blanc ? JoueurNoir.Nom : JoueurBlanc.Nom;
             }
         }
 
         /// <summary>
-        /// Vérifie si un joueur peut sortir de l'échec
+        /// Indique si le camp a au moins un coup légal (géométrie + le roi du camp ne finit pas en échec).
+        /// Utilisé pour l'échec et mat et le pat.
         /// </summary>
-        private bool PeutSortirDeEchec(Couleur couleur)
+        private bool CampPossedeAuMoinsUnCoupLegal(Couleur couleur)
         {
-            // Pour l'instant, simplifier cette méthode
-            List<Piece> pieces = Echiquier.ObtenirPieces(couleur);
-            return pieces.Count > 0; // Si il y a des pièces, on peut théoriquement bouger
+            foreach (Piece piece in Echiquier.ObtenirPieces(couleur))
+            {
+                Position depart = piece.Position;
+                foreach (Position arrivee in piece.ObtenirMouvementsPossibles(Echiquier))
+                {
+                    if (!MouvementMetRoiEnEchec(depart, arrivee))
+                        return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
-        /// Vérifie le pat (nul)
+        /// Vérifie le pat (nul) : pas en échec et aucun coup légal.
         /// </summary>
         public bool EstPat()
         {
             if (Echiquier.RoiEstEnEchec(JoueurActuel.Couleur))
-                return false; // Pas de pat si en échec
+                return false;
 
-            return !PeutSortirDeEchec(JoueurActuel.Couleur);
+            return !CampPossedeAuMoinsUnCoupLegal(JoueurActuel.Couleur);
         }
 
         /// <summary>
-        /// Obtient les mouvements possibles pour une position
+        /// Obtient les mouvements légaux pour une position (filtre les coups qui laisseraient le roi en échec).
         /// </summary>
         public List<Position> ObtenirMouvementsPossibles(Position position)
         {
@@ -248,7 +275,14 @@ namespace echec_poo.Game
             if (piece == null || piece.Couleur != JoueurActuel.Couleur)
                 return new List<Position>();
 
-            return piece.ObtenirMouvementsPossibles(Echiquier);
+            List<Position> legaux = new List<Position>();
+            foreach (Position arrivee in piece.ObtenirMouvementsPossibles(Echiquier))
+            {
+                if (!MouvementMetRoiEnEchec(position, arrivee))
+                    legaux.Add(arrivee);
+            }
+
+            return legaux;
         }
 
         /// <summary>
@@ -272,7 +306,8 @@ namespace echec_poo.Game
         /// </summary>
         public string AfficherAvecMouvements(Position position)
         {
-            return Echiquier.AfficherEchiquierAvecMouvements(position, JoueurActuel.Couleur);
+            List<Position> legaux = ObtenirMouvementsPossibles(position);
+            return Echiquier.AfficherEchiquierAvecMouvements(position, JoueurActuel.Couleur, legaux);
         }
 
         /// <summary>

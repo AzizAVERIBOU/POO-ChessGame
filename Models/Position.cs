@@ -48,11 +48,21 @@ namespace echec_poo.Models
             return HashCode.Combine(Ligne, Colonne);
         }
 
+        /// <summary>
+        /// Tente de créer une position ; retourne null si les indices sont hors plateau.
+        /// </summary>
+        public static Position? CreerSiValide(int ligne, int colonne)
+        {
+            if (ligne < 0 || ligne > 7 || colonne < 0 || colonne > 7)
+                return null;
+            return new Position(ligne, colonne);
+        }
+
         public override string ToString()
         {
-            // Afficher la position avec la numérotation inversée (1 en haut, 8 en bas)
-            int numeroAffiche = 8 - Ligne;
-            return $"{(char)('a' + Colonne)}{numeroAffiche}";
+            // Notation FIDE : rangée 1 = côté blanc (Ligne 0), rangée 8 = côté noir (Ligne 7)
+            int rang = Ligne + 1;
+            return $"{(char)('a' + Colonne)}{rang}";
         }
 
         /// <summary>
@@ -69,10 +79,9 @@ namespace echec_poo.Models
             if (colonne < 'a' || colonne > 'h' || ligne < '1' || ligne > '8')
                 throw new ArgumentException("Notation invalide");
 
-            // Conversion avec numérotation inversée :
-            // a1 affiché = (7,0), a8 affiché = (0,0), h1 affiché = (7,7), h8 affiché = (0,7)
-            // Ligne 1 affichée = index 7, ligne 8 affichée = index 0
-            int ligneIndex = 8 - (ligne - '0');
+            // FIDE : rangée 1 (fond blanc) → Ligne 0, rangée 8 (fond noir) → Ligne 7 (aligné sur InitialiserPositionDepart)
+            int chiffreRang = ligne - '0';
+            int ligneIndex = chiffreRang - 1;
             int colonneIndex = colonne - 'a';
             
             return new Position(ligneIndex, colonneIndex);

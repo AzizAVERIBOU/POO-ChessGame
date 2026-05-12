@@ -46,10 +46,14 @@ namespace echec_poo.Pieces
                      (Couleur == Couleur.Noir && Position.Ligne == 6)))
                     return true;
             }
-            // Prise en diagonale
+            // Prise en diagonale (pièce adverse ou prise en passant vers une case vide)
             else if (Math.Abs(deltaColonne) == 1 && deltaLigne == direction)
             {
-                return pieceCible != null && pieceCible.Couleur != Couleur;
+                if (pieceCible != null && pieceCible.Couleur != Couleur)
+                    return true;
+                if (pieceCible == null)
+                    return echiquier.EstCoupPriseEnPassant(Position, destination);
+                return false;
             }
 
             return false;
@@ -61,38 +65,42 @@ namespace echec_poo.Pieces
             int direction = Couleur == Couleur.Blanc ? 1 : -1;
 
             // Mouvement d'une case
-            Position mouvement1 = new Position(Position.Ligne + direction, Position.Colonne);
-            if (mouvement1.EstValide() && echiquier.PositionEstLibre(mouvement1))
+            Position? mouvement1 = Position.CreerSiValide(Position.Ligne + direction, Position.Colonne);
+            if (mouvement1 != null && echiquier.PositionEstLibre(mouvement1))
             {
                 mouvements.Add(mouvement1);
             }
 
             // Premier mouvement de 2 cases
-            if (!ADejaBouge)
+            if (!ADejaBouge && mouvement1 != null)
             {
-                Position mouvement2 = new Position(Position.Ligne + 2 * direction, Position.Colonne);
-                if (mouvement2.EstValide() && echiquier.PositionEstLibre(mouvement2) && 
+                Position? mouvement2 = Position.CreerSiValide(Position.Ligne + 2 * direction, Position.Colonne);
+                if (mouvement2 != null && echiquier.PositionEstLibre(mouvement2) &&
                     echiquier.PositionEstLibre(mouvement1))
                 {
                     mouvements.Add(mouvement2);
                 }
             }
 
-            // Prises en diagonale
-            for (int deltaColonne = -1; deltaColonne <= 1; deltaColonne += 2)
+            // Prises en diagonale (y compris en passant)
+            for (int deltaCol = -1; deltaCol <= 1; deltaCol += 2)
             {
                 int nouvelleLigne = Position.Ligne + direction;
-                int nouvelleColonne = Position.Colonne + deltaColonne;
-                
+                int nouvelleColonne = Position.Colonne + deltaCol;
+
                 if (nouvelleLigne >= 0 && nouvelleLigne <= 7 && nouvelleColonne >= 0 && nouvelleColonne <= 7)
                 {
                     Position prise = new Position(nouvelleLigne, nouvelleColonne);
                     Piece? pieceCible = echiquier.ObtenirPiece(prise);
                     if (pieceCible != null && pieceCible.Couleur != Couleur)
-                    {
                         mouvements.Add(prise);
-                    }
                 }
+            }
+
+            if (echiquier.CasePriseEnPassant is Position pep)
+            {
+                if (echiquier.EstCoupPriseEnPassant(Position, pep))
+                    mouvements.Add(pep);
             }
 
             return mouvements;

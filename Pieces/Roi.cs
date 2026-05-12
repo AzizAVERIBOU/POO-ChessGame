@@ -49,20 +49,18 @@ namespace echec_poo.Pieces
 
             for (int i = 0; i < 8; i++)
             {
-                Position nouvellePosition = new Position(
+                Position? nouvellePosition = Position.CreerSiValide(
                     Position.Ligne + directions[i, 0],
-                    Position.Colonne + directions[i, 1]
-                );
+                    Position.Colonne + directions[i, 1]);
+                if (nouvellePosition == null)
+                    continue;
 
-                if (nouvellePosition.EstValide())
+                Piece? pieceCible = echiquier.ObtenirPiece(nouvellePosition);
+                if (pieceCible == null || pieceCible.Couleur != Couleur)
                 {
-                    Piece? pieceCible = echiquier.ObtenirPiece(nouvellePosition);
-                    if (pieceCible == null || pieceCible.Couleur != Couleur)
-                    {
-                        // TODO: Vérifier que le roi ne se met pas en échec
-                        // Cette vérification sera implémentée dans l'itération 5
-                        mouvements.Add(nouvellePosition);
-                    }
+                    // TODO: Vérifier que le roi ne se met pas en échec
+                    // Cette vérification sera implémentée dans l'itération 5
+                    mouvements.Add(nouvellePosition);
                 }
             }
 

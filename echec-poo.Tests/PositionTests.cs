@@ -5,9 +5,9 @@ namespace echec_poo.Tests;
 public class PositionTests
 {
     [Theory]
-    [InlineData("a1", 7, 0)]
-    [InlineData("h8", 0, 7)]
-    [InlineData("e4", 4, 4)]
+    [InlineData("a1", 0, 0)]
+    [InlineData("h8", 7, 7)]
+    [InlineData("e4", 3, 4)]
     public void DepuisNotation_parse_correctement(string notation, int ligne, int colonne)
     {
         // Arrange
@@ -25,8 +25,8 @@ public class PositionTests
     public void ToString_retourne_notation_algébrique()
     {
         // Arrange
-        var posE4 = new Position(4, 4);
-        var posA1 = new Position(7, 0);
+        var posE4 = new Position(3, 4);
+        var posA1 = new Position(0, 0);
 
         // Act
         string sE4 = posE4.ToString();
@@ -35,6 +35,24 @@ public class PositionTests
         // Assert
         Assert.Equal("e4", sE4);
         Assert.Equal("a1", sA1);
+    }
+
+    [Theory]
+    [InlineData(0, 0)]
+    [InlineData(7, 7)]
+    [InlineData(3, 4)]
+    [InlineData(6, 0)]
+    public void ToString_et_DepuisNotation_sont_réciproques(int ligne, int colonne)
+    {
+        // Arrange
+        var pos = new Position(ligne, colonne);
+
+        // Act
+        string notation = pos.ToString();
+        var reparsée = Position.DepuisNotation(notation);
+
+        // Assert
+        Assert.Equal(pos, reparsée);
     }
 
     [Fact]
