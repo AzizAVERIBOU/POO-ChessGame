@@ -23,11 +23,80 @@ namespace echec_poo.Game
             {
                 TypeCoup.Normal => EvaluerNormal(echiquier, coup),
                 TypeCoup.PriseEnPassant => EvaluerPriseEnPassant(echiquier, coup),
-                TypeCoup.RoquePetit or TypeCoup.RoqueGrand or TypeCoup.Promotion =>
+                TypeCoup.RoquePetit => EvaluerRoque(echiquier, coup, petitAttendu: true),
+                TypeCoup.RoqueGrand => EvaluerRoque(echiquier, coup, petitAttendu: false),
+                TypeCoup.Promotion =>
                     throw new NotSupportedException(
                         $"Le type de coup {coup.Type} sera pris en charge dans une phase ultérieure."),
                 _ => throw new ArgumentOutOfRangeException(nameof(coup), coup.Type, "Valeur d'énumération inconnue.")
             };
+        }
+
+        private static bool EvaluerRoque(Echiquier ech, Coup coup, bool petitAttendu)
+        {
+            bool petit = coup.Arrivee.Colonne > coup.Depart.Colonne;
+            if (petit != petitAttendu)
+                return false;
+
+            Piece? roiDep = ech.ObtenirPiece(coup.Depart);
+            if (roiDep is not Roi r)
+                return false;
+
+            Couleur camp = r.Couleur;
+            bool bp = ech.BlancRoquePetit;
+            bool bg = ech.BlancRoqueGrand;
+            bool np = ech.NoirRoquePetit;
+            bool ng = ech.NoirRoqueGrand;
+            Position? pep = ech.CasePriseEnPassant;
+
+            bool roiAdb = r.ADejaBouge;
+            int ligne = coup.Depart.Ligne;
+            int colTourDep = petit ? 7 : 0;
+            Piece? tour = ech.ObtenirPiece(new Position(ligne, colTourDep));
+            if (tour is not Tour t)
+                return false;
+
+            bool tourAdb = t.ADejaBouge;
+            Position posTourDepart = t.Position;
+            Position roiArrivee = coup.Arrivee;
+            int colTourArr = petit ? 5 : 3;
+            Position tourArrivee = new Position(ligne, colTourArr);
+
+            ech.RetirerPiece(coup.Depart);
+            ech.RetirerPiece(posTourDepart);
+            r.DeplacerVers(roiArrivee);
+            t.DeplacerVers(tourArrivee);
+            ech.PlacerPiece(r);
+            ech.PlacerPiece(t);
+
+            ech.CasePriseEnPassant = null;
+            if (camp == Couleur.Blanc)
+            {
+                ech.BlancRoquePetit = false;
+                ech.BlancRoqueGrand = false;
+            }
+            else
+            {
+                ech.NoirRoquePetit = false;
+                ech.NoirRoqueGrand = false;
+            }
+
+            bool enEchec = ech.RoiEstEnEchec(camp);
+
+            ech.RetirerPiece(roiArrivee);
+            ech.RetirerPiece(tourArrivee);
+            r.RestaurerEtatApresSimulation(coup.Depart, roiAdb);
+            t.RestaurerEtatApresSimulation(posTourDepart, tourAdb);
+            ech.PlacerPiece(r);
+            ech.PlacerPiece(t);
+
+            ech.BlancRoquePetit = bp;
+            ech.BlancRoqueGrand = bg;
+            ech.NoirRoquePetit = np;
+            ech.NoirRoqueGrand = ng;
+            ech.CasePriseEnPassant = pep;
+
+            return enEchec;
         }
 
         private static bool EvaluerPriseEnPassant(Echiquier echiquier, Coup coup)

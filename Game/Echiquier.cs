@@ -17,6 +17,11 @@ namespace echec_poo.Game
         /// </summary>
         public Position? CasePriseEnPassant { get; set; }
 
+        public bool BlancRoquePetit { get; set; }
+        public bool BlancRoqueGrand { get; set; }
+        public bool NoirRoquePetit { get; set; }
+        public bool NoirRoqueGrand { get; set; }
+
         public Echiquier()
         {
             _pieces = new Piece?[8, 8];
@@ -65,6 +70,9 @@ namespace echec_poo.Game
             if (!piece.PeutSeDeplacerVers(arrivee, this))
                 return false;
 
+            if (EstDeplacementRoque2Cases(depart, arrivee))
+                return ExecuterRoque(depart, arrivee);
+
             bool priseEp = EstCoupPriseEnPassant(depart, arrivee);
             Position? casePionPrisEp = null;
             if (priseEp)
@@ -90,6 +98,163 @@ namespace echec_poo.Game
             PlacerPiece(piece);
 
             return true;
+        }
+
+        /// <summary>
+        /// Indique si le déplacement est un roque de deux cases (roi e → g ou e → c sur la rangée initiale).
+        /// </summary>
+        public bool EstDeplacementRoque2Cases(Position depart, Position arrivee)
+        {
+            Piece? p = ObtenirPiece(depart);
+            if (p is not Roi)
+                return false;
+            int ligneFond = p.Couleur == Couleur.Blanc ? 0 : 7;
+            if (depart.Ligne != ligneFond || depart.Colonne != 4)
+                return false;
+            if (arrivee.Ligne != depart.Ligne || Math.Abs(arrivee.Colonne - depart.Colonne) != 2)
+                return false;
+            return arrivee.Colonne is 2 or 6;
+        }
+
+        public bool EstCoupRoquePetit(Position depart, Position arrivee) =>
+            EstDeplacementRoque2Cases(depart, arrivee) && arrivee.Colonne > depart.Colonne;
+
+        public bool EstCoupRoqueGrand(Position depart, Position arrivee) =>
+            EstDeplacementRoque2Cases(depart, arrivee) && arrivee.Colonne < depart.Colonne;
+
+        /// <summary>
+        /// Roque côté roi : e1-g1 / e8-g8, chemins libres, roi non en échec, cases traversées non attaquées.
+        /// </summary>
+        public bool PeutRoquerPetit(Couleur couleur)
+        {
+            if (couleur == Couleur.Blanc && !BlancRoquePetit)
+                return false;
+            if (couleur == Couleur.Noir && !NoirRoquePetit)
+                return false;
+
+            int ligne = couleur == Couleur.Blanc ? 0 : 7;
+            Couleur adverse = couleur == Couleur.Blanc ? Couleur.Noir : Couleur.Blanc;
+
+            Piece? roi = ObtenirPiece(new Position(ligne, 4));
+            Piece? tour = ObtenirPiece(new Position(ligne, 7));
+            if (roi is not Roi || tour is not Tour || tour.Couleur != couleur || roi.Couleur != couleur)
+                return false;
+            if (roi.ADejaBouge || tour.ADejaBouge)
+                return false;
+
+            if (!PositionEstLibre(new Position(ligne, 5)) || !PositionEstLibre(new Position(ligne, 6)))
+                return false;
+
+            if (RoiEstEnEchec(couleur))
+                return false;
+            if (PositionEstAttaquee(new Position(ligne, 5), adverse) || PositionEstAttaquee(new Position(ligne, 6), adverse))
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Roque côté dame : e1-c1 / e8-c8.
+        /// </summary>
+        public bool PeutRoquerGrand(Couleur couleur)
+        {
+            if (couleur == Couleur.Blanc && !BlancRoqueGrand)
+                return false;
+            if (couleur == Couleur.Noir && !NoirRoqueGrand)
+                return false;
+
+            int ligne = couleur == Couleur.Blanc ? 0 : 7;
+            Couleur adverse = couleur == Couleur.Blanc ? Couleur.Noir : Couleur.Blanc;
+
+            Piece? roi = ObtenirPiece(new Position(ligne, 4));
+            Piece? tour = ObtenirPiece(new Position(ligne, 0));
+            if (roi is not Roi || tour is not Tour || tour.Couleur != couleur || roi.Couleur != couleur)
+                return false;
+            if (roi.ADejaBouge || tour.ADejaBouge)
+                return false;
+
+            if (!PositionEstLibre(new Position(ligne, 1)) || !PositionEstLibre(new Position(ligne, 2)) ||
+                !PositionEstLibre(new Position(ligne, 3)))
+                return false;
+
+            if (RoiEstEnEchec(couleur))
+                return false;
+            if (PositionEstAttaquee(new Position(ligne, 3), adverse) || PositionEstAttaquee(new Position(ligne, 2), adverse))
+                return false;
+
+            return true;
+        }
+
+        private bool ExecuterRoque(Position departRoi, Position arriveeRoi)
+        {
+            bool petit = arriveeRoi.Colonne > departRoi.Colonne;
+            int ligne = departRoi.Ligne;
+            int colTourDepart = petit ? 7 : 0;
+            int colTourArrivee = petit ? 5 : 3;
+
+            Piece? roi = ObtenirPiece(departRoi);
+            Position posTour = new Position(ligne, colTourDepart);
+            Piece? tour = ObtenirPiece(posTour);
+            if (roi is not Roi || tour is not Tour)
+                return false;
+
+            RetirerPiece(departRoi);
+            RetirerPiece(posTour);
+            roi.DeplacerVers(arriveeRoi);
+            tour.DeplacerVers(new Position(ligne, colTourArrivee));
+            PlacerPiece(roi);
+            PlacerPiece(tour);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Met à jour les droits au roque après un demi-coup (roi, tour, ou prise d'une tour sur coin initial).
+        /// </summary>
+        public void MettreAJourDroitsRoqueApresDemiCoup(Position depart, Position arrivee, Piece pieceDeplacee, Piece? captureeSurArrivee)
+        {
+            if (pieceDeplacee is Roi)
+            {
+                if (pieceDeplacee.Couleur == Couleur.Blanc)
+                {
+                    BlancRoquePetit = false;
+                    BlancRoqueGrand = false;
+                }
+                else
+                {
+                    NoirRoquePetit = false;
+                    NoirRoqueGrand = false;
+                }
+            }
+            else if (pieceDeplacee is Tour)
+            {
+                if (depart.Ligne == 0 && depart.Colonne == 7)
+                    BlancRoquePetit = false;
+                if (depart.Ligne == 0 && depart.Colonne == 0)
+                    BlancRoqueGrand = false;
+                if (depart.Ligne == 7 && depart.Colonne == 7)
+                    NoirRoquePetit = false;
+                if (depart.Ligne == 7 && depart.Colonne == 0)
+                    NoirRoqueGrand = false;
+            }
+
+            if (captureeSurArrivee is Tour)
+            {
+                if (captureeSurArrivee.Couleur == Couleur.Blanc)
+                {
+                    if (arrivee.Ligne == 0 && arrivee.Colonne == 7)
+                        BlancRoquePetit = false;
+                    if (arrivee.Ligne == 0 && arrivee.Colonne == 0)
+                        BlancRoqueGrand = false;
+                }
+                else
+                {
+                    if (arrivee.Ligne == 7 && arrivee.Colonne == 7)
+                        NoirRoquePetit = false;
+                    if (arrivee.Ligne == 7 && arrivee.Colonne == 0)
+                        NoirRoqueGrand = false;
+                }
+            }
         }
 
         /// <summary>
@@ -186,6 +351,8 @@ namespace echec_poo.Game
         public void InitialiserPositionDepart()
         {
             CasePriseEnPassant = null;
+            BlancRoquePetit = BlancRoqueGrand = true;
+            NoirRoquePetit = NoirRoqueGrand = true;
             // Vider l'échiquier
             _pieces = new Piece?[8, 8];
 

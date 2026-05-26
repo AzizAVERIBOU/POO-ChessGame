@@ -98,6 +98,11 @@ namespace echec_poo.Game
                 if (!mouvementValide)
                     return false;
 
+                Piece? captureeSurArrivee = null;
+                if (!Echiquier.EstCoupPriseEnPassant(depart, arrivee) &&
+                    !Echiquier.EstDeplacementRoque2Cases(depart, arrivee))
+                    captureeSurArrivee = Echiquier.ObtenirPiece(arrivee);
+
                 // Vérifier que le mouvement ne met pas le roi en échec
                 bool metRoiEnEchec = MouvementMetRoiEnEchec(depart, arrivee);
 #if DEBUG
@@ -115,7 +120,9 @@ namespace echec_poo.Game
                 
                 if (mouvementReussi)
                 {
-                    MettreAJourCasePriseEnPassant(Echiquier.ObtenirPiece(arrivee)!, depart, arrivee);
+                    Piece pieceApres = Echiquier.ObtenirPiece(arrivee)!;
+                    Echiquier.MettreAJourDroitsRoqueApresDemiCoup(depart, arrivee, pieceApres, captureeSurArrivee);
+                    MettreAJourCasePriseEnPassant(pieceApres, depart, arrivee);
                     // Changer de joueur
                     ChangerTour();
                     
@@ -212,9 +219,14 @@ namespace echec_poo.Game
             if (piece == null)
                 return false;
 
-            TypeCoup type = Echiquier.EstCoupPriseEnPassant(depart, arrivee)
-                ? TypeCoup.PriseEnPassant
-                : TypeCoup.Normal;
+            TypeCoup type = TypeCoup.Normal;
+            if (Echiquier.EstCoupPriseEnPassant(depart, arrivee))
+                type = TypeCoup.PriseEnPassant;
+            else if (Echiquier.EstCoupRoquePetit(depart, arrivee))
+                type = TypeCoup.RoquePetit;
+            else if (Echiquier.EstCoupRoqueGrand(depart, arrivee))
+                type = TypeCoup.RoqueGrand;
+
             Coup coup = new Coup(depart, arrivee, type);
             return SimulationPlateau.RoiSeraitEnEchecApresCoup(Echiquier, coup);
         }

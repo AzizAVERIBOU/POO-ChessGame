@@ -19,6 +19,8 @@
 **/LICENSE
 
 # Fichiers de test
+echec-poo.Tests/
+echec-poo.sln
 **/TestResults/
 **/*.trx
 
