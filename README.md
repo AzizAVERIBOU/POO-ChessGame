@@ -1,119 +1,125 @@
-# Jeu d'Échecs en C# - Projet POO
+# Chess Game in C# - OOP Project
 
-Un jeu d'échecs realiser sur console lors du cours de POO (programmation orientee objet) développé en C# pour démontrer les concepts de la Programmation Orientée Objet.
+A console chess game built during an OOP (Object-Oriented Programming) course, developed in C# to demonstrate Object-Oriented Programming concepts.
 
 [![.NET](https://img.shields.io/badge/.NET-8.0-blue.svg)](https://dotnet.microsoft.com/download)
 [![C#](https://img.shields.io/badge/C%23-12.0-purple.svg)](https://docs.microsoft.com/en-us/dotnet/csharp/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## Objectifs du Projet
+## Play Online
 
-Ce projet vise à démontrer la maîtrise des concepts fondamentaux de la POO :
-- **Héritage** : Classes spécialisées héritant de `Piece`
-- **Polymorphisme** : Méthodes virtuelles et abstraites
-- **Encapsulation** : Propriétés privées avec accesseurs
-- **Abstraction** : Classe abstraite `Piece`
-- **Composition** : `Echiquier` contient des `Piece`
+The game is available in the browser via a web terminal:
 
-## Fonctionnalités
+**[https://poo-chessgame.onrender.com/](https://poo-chessgame.onrender.com/)**
 
-### ✅ Fonctionnalités Implémentées
-- [x] **Toutes les pièces d'échecs** : Pion, Tour, Cavalier, Fou, Dame, Roi
-- [x] **Règles de déplacement** : Mouvements spécifiques à chaque pièce
-- [x] **Interface utilisateur** : Menu interactif en console
-- [x] **Affichage amélioré** : Indication visuelle des pièces du joueur actuel
-- [x] **Validation des mouvements** : Vérification des règles d'échecs
-- [x] **Notation algébrique** : Support des mouvements en format "e2-e4"
-- [x] **Système de tours** : Gestion des joueurs blancs et noirs
-- [x] **Détection d'échec** : Vérification basique de l'échec
+## Project Goals
+
+This project aims to demonstrate mastery of fundamental OOP concepts:
+- **Inheritance**: Specialized classes inheriting from `Piece`
+- **Polymorphism**: Virtual and abstract methods
+- **Encapsulation**: Private properties with accessors
+- **Abstraction**: Abstract class `Piece`
+- **Composition**: `Echiquier` contains `Piece` objects
+
+## Features
+
+### ✅ Implemented Features
+- [x] **All chess pieces**: Pawn, Rook, Knight, Bishop, Queen, King
+- [x] **Movement rules**: Piece-specific moves
+- [x] **User interface**: Interactive console menu
+- [x] **Enhanced display**: Visual indication of the current player's pieces
+- [x] **Move validation**: Chess rule verification
+- [x] **Algebraic notation**: Support for moves in "e2-e4" format
+- [x] **Turn system**: White and black player management
+- [x] **Check detection**: Basic check verification
 
 ## Architecture
 
 ```
 echec-poo/
 ├── Models/
-│   ├── Position.cs      # Coordonnées et notation algébrique FIDE
-│   ├── Couleur.cs       # Enumération des couleurs
-│   └── Piece.cs         # Classe abstraite de base
+│   ├── Position.cs      # Coordinates and FIDE algebraic notation
+│   ├── Couleur.cs       # Color enumeration
+│   └── Piece.cs         # Base abstract class
 ├── Game/
-│   ├── Echiquier.cs     # Gestion du plateau et affichage
-│   ├── JeuEchecs.cs     # Logique principale du jeu
-│   ├── Joueur.cs        # Représentation des joueurs
-│   └── InterfaceJeu.cs  # Interface utilisateur
+│   ├── Echiquier.cs     # Board management and display
+│   ├── JeuEchecs.cs     # Main game logic
+│   ├── Joueur.cs        # Player representation
+│   └── InterfaceJeu.cs  # User interface
 ├── Pieces/
-│   ├── Pion.cs          # Implémentation du pion
-│   ├── Tour.cs          # Implémentation de la tour
-│   ├── Cavalier.cs      # Implémentation du cavalier
-│   ├── Fou.cs           # Implémentation du fou
-│   ├── Dame.cs          # Implémentation de la dame
-│   └── Roi.cs           # Implémentation du roi
-├── echec-poo.Tests/     # Tests unitaires (xUnit)
-└── Program.cs           # Point d'entrée et tests console
+│   ├── Pion.cs          # Pawn implementation
+│   ├── Tour.cs          # Rook implementation
+│   ├── Cavalier.cs      # Knight implementation
+│   ├── Fou.cs           # Bishop implementation
+│   ├── Dame.cs          # Queen implementation
+│   └── Roi.cs           # King implementation
+├── echec-poo.Tests/     # Unit tests (xUnit)
+└── Program.cs           # Entry point and console tests
 ```
 
-## Utilisation
+## Usage
 
-### Prérequis
-- [.NET 8.0](https://dotnet.microsoft.com/download) ou version ultérieure
+### Prerequisites
+- [.NET 8.0](https://dotnet.microsoft.com/download) or later
 
-### Installation et Exécution
+### Installation and Execution
 
 ```bash
-# Cloner le dépôt
-git clone https://github.com/VOTRE_USERNAME/jeu-echecs-csharp.git
-cd jeu-echecs-csharp
+# Clone the repository
+git clone https://github.com/AzizAVERIBOU/POO-ChessGame.git
+cd POO-ChessGame
 
-# Compiler le projet
+# Build the project
 dotnet build
 
-# Exécuter le jeu
+# Run the game
 dotnet run
 ```
 
-### Comment Jouer
+### How to Play
 
-1. **Lancer le jeu** : Exécutez `dotnet run`
-2. **Afficher l'échiquier** : Choisissez l'option 2
-3. **Jouer un coup** : Choisissez l'option 3 et entrez votre mouvement (ex: "e2-e4")
-4. **Voir les mouvements** : Choisissez l'option 4 pour voir les mouvements possibles d'une pièce
+1. **Start the game**: Run `dotnet run`
+2. **Display the board**: Choose option 2
+3. **Make a move**: Choose option 3 and enter your move (e.g. "e2-e4")
+4. **View possible moves**: Choose option 4 to see the legal moves for a piece
 
-## Fonctionnalités Spéciales
+## Special Features
 
-### Indication Visuelle
-- Les pièces du joueur actuel sont entourées d'astérisques (*P*)
-- Interface claire avec légende explicative
+### Visual Indication
+- The current player's pieces are surrounded by asterisks (*P*)
+- Clear interface with explanatory legend
 
-### Notation algébrique (FIDE)
+### Algebraic Notation (FIDE)
 
-- **Rangées** : 1 = côté blanc (fond), 8 = côté noir — aligné sur l’affichage console et sur `Position.DepuisNotation` / `ToString`.
-- **Coups** : `e2e4` ou `e2-e4` (départ puis arrivée, deux cases en notation standard).
+- **Ranks**: 1 = white side (bottom), 8 = black side — aligned with the console display and with `Position.DepuisNotation` / `ToString`.
+- **Moves**: `e2e4` or `e2-e4` (from square then to square, two squares in standard notation).
 
-### Architecture POO
-- **Héritage** : Chaque pièce hérite de la classe `Piece`
-- **Polymorphisme** : Méthodes virtuelles redéfinies pour chaque pièce
-- **Encapsulation** : Propriétés privées avec accesseurs publics
-- **Abstraction** : Classe `Piece` abstraite avec méthodes abstraites
-- **Composition** : `Echiquier` contient un tableau de `Piece`
+### OOP Architecture
+- **Inheritance**: Each piece inherits from the `Piece` class
+- **Polymorphism**: Virtual methods overridden for each piece
+- **Encapsulation**: Private properties with public accessors
+- **Abstraction**: Abstract `Piece` class with abstract methods
+- **Composition**: `Echiquier` contains an array of `Piece` objects
 
 ## Tests
 
-Le projet inclut des tests intégrés qui s'exécutent automatiquement au lancement :
-- Test de l'initialisation de l'échiquier
-- Test des mouvements de base
-- Test de la validation des positions
+The project includes integrated tests that run automatically on startup:
+- Chessboard initialization test
+- Basic move test
+- Position validation test
 
-## Améliorations Futures
+## Future Improvements
 
-- [ ] Prise en passant
-- [ ] Promotion des pions
-- [ ] Roque (petit et grand)
-- [ ] Interface graphique
-- [ ] Sauvegarde/chargement de parties
+- [ ] En passant
+- [ ] Pawn promotion
+- [ ] Castling (kingside and queenside)
+- [ ] Graphical interface
+- [ ] Save/load games
 
-## Licence
+## License
 
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-*Développé dans le cadre d'un projet d'apprentissage de la Programmation Orientée Objet en C#*
+*Developed as part of an Object-Oriented Programming learning project in C#*
